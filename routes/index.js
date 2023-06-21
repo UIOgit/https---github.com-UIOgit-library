@@ -1,5 +1,6 @@
 const express = require('express');
 const classes = require('../models/classes');
+const fileMulter = require('../helpers/fileManager');
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ router.get('/api/books', (request, response)=>
 {
     const {books} = classes.library;
     response.json(books);
-})
+});
 router.get('/api/books/:id', (request, response)=>
 {
     const {books} = classes.library; 
@@ -24,14 +25,36 @@ router.get('/api/books/:id', (request, response)=>
             response.status(404);
             response.json ('404 | Страница не найдена');
         }
-})
+});
+router.get('/api/books/:id/download',
+    // fileMulter.single('download'),
+    (request, response)=>
+    {
+        const {books} = classes.library; 
+        const {id} = request.params;
+        const index = books.findIndex(element => element.id === id);
+                
+        if(index != -1 && request.file)
+        {
+            response.json(request.file.path);
+            response.json(request.path);
+            response.json(books[index].fileBook);
+
+            // response.download(request.path);
+        }
+        else
+        {
+            response.status(500);
+            response.json ('500 | Файл не найден');
+        }
+    });
 
 //POST
 router.post('/api/user',(request, response)=>
 {
     response.status(201);
     response.json({"id": "1", "mail":"test@mail.ru"});
-})
+});
 router.post('/api/books/', (request, response)=>
 {
     const {books} = classes.library; 
